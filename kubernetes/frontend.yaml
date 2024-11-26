@@ -16,19 +16,19 @@ spec:
     spec:
       containers:
       - name: frontend
-        image: DOCKERHUB IMAGE FRONTEND
+        image: jonathanskoog1/front_app:frontend
         ports:
         - containerPort: 3000
         env:
         - name: BACKEND_URL
           valueFrom:
-            configKeyRef:
+            configMapKeyRef:
               name: backend-config
               key: backend-url
         env:
         - name: AUDIO_URL
           valueFrom:
-            configKeyRef:
+            configMapKeyRef:
               name: audio-config
               key: audio-url
 ---
