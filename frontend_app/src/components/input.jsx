@@ -20,19 +20,17 @@ const InputSection = () => {
         gsap.from(".input", { delay: 1.2, y: 50, opacity: 0 });
     }, []);
 
-    useEffect(() => {
-        // Function to fetch data from the backend API
-        const fetchData = async () => {
-          try {
+
+    // Function to fetch data from the backend API
+    const fetchData = async () => {
+        try {
             const response = await axios.get('http://localhost:3001/'); // Replace with your backend API URL
             setData(response.data);
-          } catch (error) {
-            console.error('Error fetching data:', error);
-          }
-        };
+        } catch (error) {
+        console.error('Error fetching data:', error);
+        }
+    };
     
-        fetchData();
-      }, []);
     
 
     function handleClickAudioService() {
@@ -46,9 +44,12 @@ const InputSection = () => {
 
     function handleClickBackendService() {
         setPressed2(true);
-        toast.success('Backend service!');
         //get audio from backend
         console.log(text); // send text to backend
+        fetchData();
+        toast.success('Backend service!');
+
+
     }
 
     return (
