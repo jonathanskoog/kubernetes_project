@@ -3,4 +3,4 @@ EXPOSE 3001
 WORKDIR /app
 COPY . .
 RUN npm install
-ENTRYPOINT ["npm", "run", "start"]
+ENTRYPOINT ["npm", "start"]

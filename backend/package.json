@@ -4,6 +4,7 @@
   "description": "This service handles the database operations for the application.",
   "main": "index.js",
   "scripts": {
+    "start": "ts-node src/index.ts",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
@@ -13,5 +14,9 @@
     "@types/express": "^5.0.0",
     "@types/node": "^22.10.0",
     "typescript": "^5.7.2"
+  },
+  "dependencies": {
+    "express": "^4.21.1",
+    "ts-node": "^10.9.2"
   }
 }
