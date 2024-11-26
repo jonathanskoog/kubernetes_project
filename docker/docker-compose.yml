@@ -1,0 +1,40 @@
+version: "3.8"
+services:
+  app:
+    image: frontend-app
+    ports:
+      - "3000:3000"
+    environment:
+      - BACKEND=backend
+      - AUDIO=audio
+
+  audio:
+    image: audio-service
+    ports:
+      - "3002:3002"
+    deploy:
+      replicas: 1
+    environment:
+      - BACKEND=backend
+
+  backend:
+    image: backend-service
+    ports:
+      - "3001:3001"
+    environment:
+      - DATABASE=postgres
+
+  postgres:
+    image: postgres:latest
+    restart: always
+    ports:
+      - "5432:5432"
+    volumes:
+      - db-data:/data/db
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgrespassword
+      - POSTGRES_DB=postgres
+
+volumes:
+  db-data:
