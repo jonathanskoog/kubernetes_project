@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
       - name: audio
-        image: DOCKERHUB IMAGE AUDIO
+        image: jonathanskoog1/front_app:audio
         ports:
         - containerPort: 3002
 ---
