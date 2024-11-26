@@ -22,9 +22,19 @@ const InputSection = () => {
 
 
     // Function to fetch data from the backend API
-    const fetchData = async () => {
+    const fetchDataBackend = async () => {
         try {
             const response = await axios.get('http://localhost:3001/'); // Replace with your backend API URL
+            setData(response.data);
+        } catch (error) {
+        console.error('Error fetching data:', error);
+        }
+    }; 
+    
+    
+    const fetchDataAudio = async () => {
+        try {
+            const response = await axios.get('http://localhost:3002/'); // Replace with your backend API URL
             setData(response.data);
         } catch (error) {
         console.error('Error fetching data:', error);
@@ -35,6 +45,7 @@ const InputSection = () => {
 
     function handleClickAudioService() {
         setPressed1(true);
+        fetchDataAudio();
         toast.info("Audio service!");
         //call api to generate audio
         console.log(text); // send text to audio service
@@ -46,7 +57,7 @@ const InputSection = () => {
         setPressed2(true);
         //get audio from backend
         console.log(text); // send text to backend
-        fetchData();
+        fetchDataBackend();
         toast.success('Backend service!');
 
 
