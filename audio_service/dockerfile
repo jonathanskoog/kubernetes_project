@@ -1,6 +1,6 @@
 FROM node:23-alpine
 RUN npm install -g nodemon
-EXPOSE 3000
+EXPOSE 3002
 WORKDIR /app
 COPY . .
 RUN npm install
