@@ -25,8 +25,8 @@ const InputSection = () => {
     // Function to fetch data from the backend API
     const fetchData = async () => {
         try {
-            const response = await axios.get('http://localhost:3001/'); // Replace with your backend API URL
-            setData(response.data);
+            const response = await axios.get('http://localhost:3001/data'); // Replace with your backend API URL
+            setData(JSON.stringify(response.data));
         } catch (error) {
             console.error('Error fetching data:', error);
         }
@@ -34,8 +34,11 @@ const InputSection = () => {
 
     const fetchAudioData = async () => {
         try {
-            const response = await axios.get('http://localhost:3002/'); // Replace with your backend API URL
-            setData(response.data);
+            const response = await axios.post('http://localhost:3001/data', {
+                query: text,
+                file: 'hej',
+            }); // Replace with your backend API URL
+            setData(JSON.stringify(response.data));
         } catch (error) {
             console.error('Error fetching data:', error);
         }
@@ -71,11 +74,11 @@ const InputSection = () => {
                     className="w-96" value={text} onChange={(e) => setText(e.target.value)} />
 
                 <Button color="primary" size='lg' isLoading={Btn1pressed} onPress={() => handleClickAudioService()}>
-                    Get from audio service
+                    Post data to backend
                 </Button>
 
                 <Button color="primary" size='lg' isLoading={Btn2pressed} onPress={() => handleClickBackendService()}>
-                    Get from backend
+                    Get data from backend
                 </Button>
             </div>
 

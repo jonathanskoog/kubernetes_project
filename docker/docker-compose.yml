@@ -1,7 +1,10 @@
-version: "3.8"
 services:
   app:
     image: frontend-app
+    container_name: frontend-app
+    build:
+      context: ../frontend_app
+      dockerfile: Dockerfile
     ports:
       - "3000:3000"
     environment:
@@ -10,6 +13,10 @@ services:
 
   audio:
     image: audio-service
+    container_name: audio-service
+    build:
+      context: ../audio_service
+      dockerfile: Dockerfile
     ports:
       - "3002:3002"
     deploy:
@@ -19,19 +26,25 @@ services:
 
   backend:
     image: backend-service
+    container_name: backend-service
+    build:
+      context: ../backend
+      dockerfile: Dockerfile
     ports:
       - "3001:3001"
+    depends_on:
+      - postgres
     environment:
-      - DATABASE=postgres
-      - DATABASE_URL=postgres://postgres:postgrespassword@database:5432/postgres
+      - DATABASE_URL=postgresql://postgres:postgrespassword@postgres:5432/postgres?schema=public
 
   postgres:
     image: postgres:latest
+    container_name: postgres
     restart: always
-    expose:
-      - "5432"
+    ports:
+      - "5432:5432"
     volumes:
-      - db-data:/data/db
+      - db-data:/var/lib/postgresql/data
     environment:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgrespassword

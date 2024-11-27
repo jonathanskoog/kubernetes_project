@@ -1,6 +1,15 @@
 FROM node:23-alpine
-EXPOSE 3001
+
 WORKDIR /app
-COPY . .
+
+COPY package*.json ./
+
 RUN npm install
+
+COPY prisma ./prisma/
+
+COPY . .
+
+RUN npx prisma generate
+
 ENTRYPOINT ["npm", "start"]
