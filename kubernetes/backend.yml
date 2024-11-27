@@ -5,7 +5,7 @@ metadata:
   labels:
     app: backend
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
       app: backend
@@ -14,12 +14,21 @@ spec:
       labels:
         app: backend
     spec:
-      containers:
-        - name: backend
-          image: DOCKERHUB IMAGE BACKEND
+      initContainers:
+        - name: run-migrations
+          image: mansnei/cloudcomputing-backend:v1
+          command: ["npx", "prisma", "migrate", "deploy"]
           env:
             - name: DATABASE_URL
               value: "postgresql://postgres:postgrespassword@postgres:5432/postgres?schema=public"
+      containers:
+        - name: backend
+          image: mansnei/cloudcomputing-backend:v1
+          env:
+            - name: DATABASE_URL
+              value: "postgresql://postgres:postgrespassword@postgres:5432/postgres?schema=public"
+            - name: NODE_ENV
+              value: production
           ports:
             - containerPort: 3001
 ---
@@ -30,6 +39,7 @@ metadata:
 spec:
   ports:
     - port: 3001
+      targetPort: 3001
   selector:
     app: backend
-  type: ClusterIP
+  type: LoadBalancer

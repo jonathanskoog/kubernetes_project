@@ -10,11 +10,13 @@ import axios from 'axios';
 
 
 const InputSection = () => {
+    const backendUrl = process.env.REACT_APP_BACKEND_URL;
+    const audioUrl = process.env.REACT_APP_AUDIO_URL
     const [Btn1pressed, setPressed1] = useState(false);
     const [Btn2pressed, setPressed2] = useState(false);
+    const [Btn3pressed, setPressed3] = useState(false);
     const [text, setText] = useState("");
     const [data, setData] = useState("hej");
-
 
 
     useGSAP(() => {
@@ -25,7 +27,7 @@ const InputSection = () => {
     // Function to fetch data from the backend API
     const fetchData = async () => {
         try {
-            const response = await axios.get('http://localhost:3001/data'); // Replace with your backend API URL
+            const response = await axios.get(`${backendUrl}/data`); // Replace with your backend API URL
             setData(JSON.stringify(response.data));
         } catch (error) {
             console.error('Error fetching data:', error);
@@ -34,7 +36,7 @@ const InputSection = () => {
 
     const fetchAudioData = async () => {
         try {
-            const response = await axios.post('http://localhost:3001/data', {
+            const response = await axios.post(`${backendUrl}/data`, {
                 query: text,
                 file: 'hej',
             }); // Replace with your backend API URL
@@ -44,6 +46,20 @@ const InputSection = () => {
         }
     };
 
+    const fetchAudioBackendData = async () => {
+        try {
+            const response = await axios.get(`${audioUrl}/backend`, {
+                query: text,
+                file: 'hej',
+            }); // Replace with your backend API URL
+            setData(JSON.stringify(response.data));
+        } catch (error) {
+            console.error('Error fetching data:', error);
+        }
+    };
+
+    console.log("hej");
+
 
 
     function handleClickAudioService() {
@@ -52,7 +68,7 @@ const InputSection = () => {
         fetchAudioData();
         //call api to generate audio
         console.log(text); // send text to audio service
-
+        setPressed1(false);
 
     }
 
@@ -62,8 +78,17 @@ const InputSection = () => {
         console.log(text); // send text to backend
         fetchData();
         toast.success('Backend service!');
+        setPressed2(false);
 
+    }
 
+    function handleClickAudioBackendService() {
+        setPressed3(true);
+        //get audio from backend
+        console.log(text); // send text to backend
+        fetchAudioBackendData();
+        toast.success('Backend service!');
+        setPressed3(false)
     }
 
     return (
@@ -79,6 +104,10 @@ const InputSection = () => {
 
                 <Button color="primary" size='lg' isLoading={Btn2pressed} onPress={() => handleClickBackendService()}>
                     Get data from backend
+                </Button>
+
+                <Button color="primary" size='lg' isLoading={Btn3pressed} onPress={() => handleClickAudioBackendService()}>
+                    Get data from audio backend
                 </Button>
             </div>
 

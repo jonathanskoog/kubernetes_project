@@ -1,8 +1,12 @@
 FROM node:23-alpine
 RUN npm install -g nodemon
-EXPOSE 3002
+
 WORKDIR /app
-COPY . .
+
+COPY package*.json ./
+
 RUN npm install
-ENV DEBUG='audio-app:*'
-ENTRYPOINT ["npm", "run", "start"]
+
+COPY . .
+
+CMD ["npm", "start"]

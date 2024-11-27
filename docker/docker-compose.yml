@@ -1,41 +1,55 @@
 services:
   app:
-    image: frontend-app
+    image: mansnei/cloudcomputing-frontend:v1
     container_name: frontend-app
     build:
       context: ../frontend_app
-      dockerfile: Dockerfile
+      dockerfile: dockerfile
     ports:
       - "3000:3000"
+    volumes:
+      - ../frontend_app:/app
+      - /app/node_modules
     environment:
-      - BACKEND=backend
-      - AUDIO=audio
+      - REACT_APP_BACKEND_URL=http://localhost:3001
+      - REACT_APP_AUDIO_URL=http://localhost:3002
 
   audio:
-    image: audio-service
+    image: mansnei/cloudcomputing-audio:v1
     container_name: audio-service
     build:
       context: ../audio_service
-      dockerfile: Dockerfile
+      dockerfile: dockerfile
     ports:
       - "3002:3002"
+    volumes:
+      - ../audio_service:/app
+      - /app/node_modules
     deploy:
       replicas: 1
     environment:
-      - BACKEND=backend
+      - BACKEND_URL=http://backend-service:3001
+      - NODE_ENV=development
+      - AUDIO_API_KEY=future_key_here
+    command: "npm run dev"
 
   backend:
-    image: backend-service
+    image: mansnei/cloudcomputing-backend:v1
     container_name: backend-service
     build:
       context: ../backend
-      dockerfile: Dockerfile
+      dockerfile: dockerfile
     ports:
       - "3001:3001"
+    volumes:
+      - ../backend:/app
+      - /app/node_modules
     depends_on:
       - postgres
     environment:
       - DATABASE_URL=postgresql://postgres:postgrespassword@postgres:5432/postgres?schema=public
+      - NODE_ENV=development
+    command: "npm run dev"
 
   postgres:
     image: postgres:latest

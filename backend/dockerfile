@@ -1,4 +1,5 @@
 FROM node:23-alpine
+RUN npm install -g nodemon
 
 WORKDIR /app
 
@@ -6,10 +7,8 @@ COPY package*.json ./
 
 RUN npm install
 
-COPY prisma ./prisma/
-
 COPY . .
 
 RUN npx prisma generate
 
-ENTRYPOINT ["npm", "start"]
+CMD ["npm", "start"]

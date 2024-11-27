@@ -16,10 +16,14 @@ spec:
     spec:
       containers:
         - name: audio
-          image: DOCKERHUB IMAGE AUDIO
+          image: mansnei/cloudcomputing-audio:v1
           env:
             - name: AUDIO_API_KEY
               value: "your-api-key"
+            - name: NODE_ENV
+              value: production
+            - name: BACKEND_URL
+              value: "http://backend:3001"
           ports:
             - containerPort: 3002
 ---
@@ -30,6 +34,7 @@ metadata:
 spec:
   ports:
     - port: 3002
+      targetPort: 3002
   selector:
     app: audio
-  type: ClusterIP
+  type: LoadBalancer
