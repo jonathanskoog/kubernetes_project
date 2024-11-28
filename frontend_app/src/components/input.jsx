@@ -35,15 +35,15 @@ const InputSection = () => {
 
     const fetchAudioData = async () => {
         try {
-            const response = await axios.post(`${audioUrl}/send_data`, {
+            const response = await axios.post(`${audioUrl}/send-data`, {
                 query: text,
             }, {
                 responseType: 'arraybuffer',
-            }); // Replace with your backend API URL
-            
+            }); 
+
             const audioBlob = new Blob([response.data], { type: 'audio/mpeg' });
             const audio = URL.createObjectURL(audioBlob);
-            // console.log(audio);
+            const id = response.headers.get('X-Files-ID');
 
 
             // setData(JSON.stringify(response.data));
@@ -94,7 +94,6 @@ const InputSection = () => {
         toast.info("Audio service!");
         fetchAudioData();
         //call api to generate audio
-        console.log(text); // send text to audio service
         setPressed1(false);
 
     }

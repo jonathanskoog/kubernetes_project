@@ -15,8 +15,7 @@ const storage = multer.diskStorage({
   },
   filename(req, file, cb) {
     const uniqueSuffix = `${Date.now()}-${Math.round(Math.random() * 1e9)}`;
-    const extension = path.extname(file.originalname); // Get original file extension
-    cb(null, `${file.fieldname}-${uniqueSuffix}${extension}`); // Custom filename
+    cb(null, `${file.fieldname}-${uniqueSuffix}.mp3`); // Custom filename
   },
 });
 const upload = multer({
@@ -24,11 +23,8 @@ const upload = multer({
   fileFilter: (req, file, cb) => {
     function fileIsNotCorrect() {
       const allowedExtenstions = [".mp3"];
-      const allowedType = ["audio/mpeg"];
-      return !(
-        allowedExtenstions.includes(path.extname(file.originalname)) &&
-        allowedType.includes(file.mimetype)
-      );
+      const allowedType = ["audio/mpeg", "application/octet-stream"];
+      return !allowedType.includes(file.mimetype);
     }
     if (fileIsNotCorrect()) {
       cb(new Error("Incorrect file type, only MP3 files are allowed."));
