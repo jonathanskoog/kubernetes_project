@@ -12,7 +12,7 @@ app.use(express.json());
 app.use(cors());
 
 // Simple route
-app.post('/data', async (req: Request, res: Response) => {
+app.post('/audio-files', async (req: Request, res: Response) => {
   const { query, file } = req.body;
   await prisma.audioEntry.create({
     data: {
@@ -23,9 +23,20 @@ app.post('/data', async (req: Request, res: Response) => {
   res.send({ success: true });
 })
 
-app.get('/data', async (req: Request, res: Response) => {
-  const data = await prisma.audioEntry.findMany();
-  res.send({ data: data })
+app.get('/audio-files/:id', async (req: Request, res: Response) => {
+  const { id } = req.params;
+  const data = [];
+  if (!id) {
+    data.push(...(await prisma.audioEntry.findMany()));
+  } else {
+    const entry = await prisma.audioEntry.findUnique({
+      where: {
+        id: id
+      }
+    });
+    entry && data.push(entry);
+  }
+  res.send({ files: data });
 })
 
 app.get('/', (req: Request, res: Response) => {
