@@ -8,7 +8,7 @@ const app = express();
 const PORT = process.env.PORT || 3001;
 const prisma = new PrismaClient();
 
-const storageFilePath = path.join(__dirname, "../audio-files");
+const storageFilePath = path.join("/app/audio-files");
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
     cb(null, storageFilePath);
