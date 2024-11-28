@@ -7,6 +7,11 @@ import { gsap } from "gsap";
 import { useGSAP } from "@gsap/react";
 import { useEffect } from 'react';
 import axios from 'axios';
+import {Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, getKeyValue} from "@nextui-org/react";
+// import PlayCircleIcon from '@mui/icons-material/PlayCircle';
+// import { AiFillPlayCircle } from "react-icons/ai";
+import PlayButtonIcon from './play_btn'; // Adjust the path to wherever your file is
+
 
 
 const InputSection = () => {
@@ -14,7 +19,6 @@ const InputSection = () => {
     const audioUrl = process.env.REACT_APP_AUDIO_URL
     const [Btn1pressed, setPressed1] = useState(false);
     const [text, setText] = useState("");
-    const [data, setData] = useState("hej");
     const [audioData, setAudioData] = useState([]);
 
 
@@ -22,16 +26,19 @@ const InputSection = () => {
         gsap.from(".input", { delay: 1.2, y: 50, opacity: 0 });
     }, []);
 
+    useEffect(() => {
+        // Fetch data from the backend
+        // const fetchData = async () => {
+        //     try {
+        //         const response = await axios.get(`${backendUrl}/audio`);
+        //         setAudioData((prevList) => [...prevList, { text: text, url: audio }]);
+        //     } catch (error) {
+        //         console.error('Error fetching data:', error);
+        //     }
+        // };
+    }, []);
 
-    // // Function to fetch data from the backend API
-    // const fetchData = async () => {
-    //     try {
-    //         const response = await axios.get(`${backendUrl}/data`); // Replace with your backend API URL
-    //         setData(JSON.stringify(response.data));
-    //     } catch (error) {
-    //         console.error('Error fetching data:', error);
-    //     }
-    // };
+
 
     const fetchAudioData = async () => {
         try {
@@ -39,22 +46,14 @@ const InputSection = () => {
                 query: text,
             }, {
                 responseType: 'arraybuffer',
-            }); // Replace with your backend API URL
+            }); 
             
             const audioBlob = new Blob([response.data], { type: 'audio/mpeg' });
             const audio = URL.createObjectURL(audioBlob);
-            // console.log(audio);
-
-
-            // setData(JSON.stringify(response.data));
+        
             setAudioData((prevList) => [...prevList, { text: text, url: audio }]);
 
-            // Automatically play the audio once it is fetched
-            // const audioElement = document.getElementById('audio-player');
-            // if (audioElement) {
-            //     audioElement.src = audio;
-            //     audioElement.load();
-            // }
+
         } catch (error) {
             console.error('Error fetching data:', error);
         }
@@ -73,83 +72,84 @@ const InputSection = () => {
         }
     };
 
-    // const fetchAudioBackendData = async () => {
-    //     try {
-    //         const response = await axios.get(`${audioUrl}/backend`, {
-    //             query: text,
-    //             file: 'hej',
-    //         }); // Replace with your backend API URL
-    //         setData(JSON.stringify(response.data));
-    //     } catch (error) {
-    //         console.error('Error fetching data:', error);
-    //     }
-    // };
-
-    // console.log("hej");
-
-
 
     function handleClickAudioService() {
         setPressed1(true);
-        toast.info("Audio service!");
+        toast.info("Audio service started!");
         fetchAudioData();
-        //call api to generate audio
-        console.log(text); // send text to audio service
         setPressed1(false);
 
     }
 
+   
+      const columns = [
+        {
+          key: "name",
+          label: "NAME",
+        },
+        {
+          key: "play",
+          label: "PLAY",
+        },
+      ];
+
 
     return (
         <>
-            <div className="flex w-screen flex-row gap-16 justify-center items-center mt-40 input">
+            <div className="flex w-screen mt-24 flex-row gap-16 justify-center items-center input">
 
                 <Input type="email" label="Text" placeholder="Enter your text to be audiofied" size="lg" key="default" color="defualt"
                     className="w-96" value={text} onChange={(e) => setText(e.target.value)} />
 
                 <Button color="primary" size='lg' isLoading={Btn1pressed} onPress={() => handleClickAudioService()}>
-                    Post data to backend
+                    Generate audio
                 </Button>
-                {/* {audioData && (
-                <div>
-                    <audio id="audio-player" src={audioData} controls />
-                    <button onClick={playAudio}>Play Audio</button>
-                </div>
-            )} */}
+           
 
             </div>
 
-            <div className='border border-red-700 w-fit'>
+            <div>
                 <Toaster richColors position='bottom-right' />
             </div>
-            {/* {data && (
-                <div className="text-center text-zinc-100">
-                    <p>{data}</p>
-                </div>
-            )} */}
+        
 
 
-              {/* Display list of generated audios with play buttons */}
-            <div className="audio-list">
-                {audioData.length > 0 ? (
-                    audioData.map((audio, index) => (
-                        <div key={index} className="audio-item">
-                        <p>{audio.text}</p>
-                        <Button color="secondary" onPress={() => playAudio(audio.url)}>
-                            Play Audio {index + 1}
-                        </Button>
-                      
-                        </div>
-                    ))
-                ) : (
+            <div className="audio-list mt-24">
+                {audioData.length > 0 ?                 
+                (
+
+                    <div className='flex flex-row justify-center items-center gap-12 '>
+                        <Table className='w-64' aria-label="Audio table">
+
+                            <TableHeader columns={columns}>
+                            {(column) => <TableColumn key={column.key}>{column.label}</TableColumn>}
+                            </TableHeader>
+
+                            <TableBody>
+                                {audioData.map((item, index) => (
+                                    <TableRow key={index}>
+                                        <TableCell>{item.text}</TableCell>
+                                        <TableCell>
+                                            <Button isIconOnly onClick={() => playAudio(item.url)}>
+                                                <PlayButtonIcon />
+                                            </Button>
+                                        </TableCell>
+                                    </TableRow>
+                                ))}
+                            </TableBody>
+
+                        </Table>
+
+                        <audio id="audio-player" controls />
+
+                    </div>
+
+                    )
+                 : (
                 <div>
-                    <p className='text-center text-zinc-400'>No audio files generated yet</p>
                 </div>
                 )}
             </div>
-
-            {/* Audio Player */}
-            <audio id="audio-player" controls />
                     
         </>
     );
