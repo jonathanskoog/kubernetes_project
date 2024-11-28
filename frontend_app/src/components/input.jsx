@@ -13,10 +13,9 @@ const InputSection = () => {
     const backendUrl = process.env.REACT_APP_BACKEND_URL;
     const audioUrl = process.env.REACT_APP_AUDIO_URL
     const [Btn1pressed, setPressed1] = useState(false);
-    const [Btn2pressed, setPressed2] = useState(false);
-    const [Btn3pressed, setPressed3] = useState(false);
     const [text, setText] = useState("");
     const [data, setData] = useState("hej");
+    const [audioData, setAudioData] = useState([]);
 
 
     useGSAP(() => {
@@ -24,41 +23,69 @@ const InputSection = () => {
     }, []);
 
 
-    // Function to fetch data from the backend API
-    const fetchData = async () => {
-        try {
-            const response = await axios.get(`${backendUrl}/data`); // Replace with your backend API URL
-            setData(JSON.stringify(response.data));
-        } catch (error) {
-            console.error('Error fetching data:', error);
-        }
-    };
+    // // Function to fetch data from the backend API
+    // const fetchData = async () => {
+    //     try {
+    //         const response = await axios.get(`${backendUrl}/data`); // Replace with your backend API URL
+    //         setData(JSON.stringify(response.data));
+    //     } catch (error) {
+    //         console.error('Error fetching data:', error);
+    //     }
+    // };
 
     const fetchAudioData = async () => {
         try {
-            const response = await axios.post(`${backendUrl}/data`, {
+            const response = await axios.post(`${audioUrl}/send_data`, {
                 query: text,
-                file: 'hej',
+            }, {
+                responseType: 'arraybuffer',
             }); // Replace with your backend API URL
-            setData(JSON.stringify(response.data));
+            
+            const audioBlob = new Blob([response.data], { type: 'audio/mpeg' });
+            const audio = URL.createObjectURL(audioBlob);
+            // console.log(audio);
+
+
+            // setData(JSON.stringify(response.data));
+            setAudioData((prevList) => [...prevList, { text: text, url: audio }]);
+
+            // Automatically play the audio once it is fetched
+            // const audioElement = document.getElementById('audio-player');
+            // if (audioElement) {
+            //     audioElement.src = audio;
+            //     audioElement.load();
+            // }
         } catch (error) {
             console.error('Error fetching data:', error);
         }
     };
 
-    const fetchAudioBackendData = async () => {
-        try {
-            const response = await axios.get(`${audioUrl}/backend`, {
-                query: text,
-                file: 'hej',
-            }); // Replace with your backend API URL
-            setData(JSON.stringify(response.data));
-        } catch (error) {
-            console.error('Error fetching data:', error);
+    const playAudio = (url) => {
+        const audioElement = document.getElementById('audio-player');
+        if (audioElement) {
+            audioElement.src = url;
+            audioElement.load();
+            audioElement.play().then(() => {
+                console.log('Audio is playing');
+            }).catch((error) => {
+                console.error('Error playing audio:', error);
+            });
         }
     };
 
-    console.log("hej");
+    // const fetchAudioBackendData = async () => {
+    //     try {
+    //         const response = await axios.get(`${audioUrl}/backend`, {
+    //             query: text,
+    //             file: 'hej',
+    //         }); // Replace with your backend API URL
+    //         setData(JSON.stringify(response.data));
+    //     } catch (error) {
+    //         console.error('Error fetching data:', error);
+    //     }
+    // };
+
+    // console.log("hej");
 
 
 
@@ -72,24 +99,6 @@ const InputSection = () => {
 
     }
 
-    function handleClickBackendService() {
-        setPressed2(true);
-        //get audio from backend
-        console.log(text); // send text to backend
-        fetchData();
-        toast.success('Backend service!');
-        setPressed2(false);
-
-    }
-
-    function handleClickAudioBackendService() {
-        setPressed3(true);
-        //get audio from backend
-        console.log(text); // send text to backend
-        fetchAudioBackendData();
-        toast.success('Backend service!');
-        setPressed3(false)
-    }
 
     return (
         <>
@@ -101,24 +110,47 @@ const InputSection = () => {
                 <Button color="primary" size='lg' isLoading={Btn1pressed} onPress={() => handleClickAudioService()}>
                     Post data to backend
                 </Button>
+                {/* {audioData && (
+                <div>
+                    <audio id="audio-player" src={audioData} controls />
+                    <button onClick={playAudio}>Play Audio</button>
+                </div>
+            )} */}
 
-                <Button color="primary" size='lg' isLoading={Btn2pressed} onPress={() => handleClickBackendService()}>
-                    Get data from backend
-                </Button>
-
-                <Button color="primary" size='lg' isLoading={Btn3pressed} onPress={() => handleClickAudioBackendService()}>
-                    Get data from audio backend
-                </Button>
             </div>
 
             <div className='border border-red-700 w-fit'>
                 <Toaster richColors position='bottom-right' />
             </div>
-            {data && (
+            {/* {data && (
                 <div className="text-center text-zinc-100">
                     <p>{data}</p>
                 </div>
-            )}
+            )} */}
+
+
+              {/* Display list of generated audios with play buttons */}
+            <div className="audio-list">
+                {audioData.length > 0 ? (
+                    audioData.map((audio, index) => (
+                        <div key={index} className="audio-item">
+                        <p>{audio.text}</p>
+                        <Button color="secondary" onPress={() => playAudio(audio.url)}>
+                            Play Audio {index + 1}
+                        </Button>
+                      
+                        </div>
+                    ))
+                ) : (
+                <div>
+                    <p className='text-center text-zinc-400'>No audio files generated yet</p>
+                </div>
+                )}
+            </div>
+
+            {/* Audio Player */}
+            <audio id="audio-player" controls />
+                    
         </>
     );
 };

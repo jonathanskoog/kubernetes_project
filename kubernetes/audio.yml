@@ -19,7 +19,7 @@ spec:
           image: mansnei/cloudcomputing-audio:v1
           env:
             - name: AUDIO_API_KEY
-              value: "your-api-key"
+              value: "sk_daa1c1d244f44fbef9559b564bed9753f55bd50933386671"
             - name: NODE_ENV
               value: production
             - name: BACKEND_URL
