@@ -14,7 +14,9 @@
   "devDependencies": {
     "@types/cors": "^2.8.17",
     "@types/express": "^5.0.0",
+    "@types/multer": "^1.4.12",
     "@types/node": "^22.10.0",
+    "multer": "^1.4.5-lts.1",
     "typescript": "^5.7.2"
   },
   "dependencies": {
