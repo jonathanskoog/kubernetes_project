@@ -54,13 +54,16 @@ app.post(
       return;
     }
 
-    await prisma.audioEntry.create({
+    const { id } = await prisma.audioEntry.create({
       data: {
         query: query,
         path: req.file.filename,
       },
+      select: {
+        id: true,
+      },
     });
-    res.send({ success: true, message: "File uploaded." });
+    res.send({ success: true, id });
   }
 );
 
