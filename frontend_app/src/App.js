@@ -17,9 +17,6 @@ function App() {
         <h1 className="text-7xl text-center text-zinc-100 font-bold heading">
           Welcome to <span className="text-zinc-900 underline">Audiofy</span>
         </h1>
-        <h1 className="text-7xl text-center text-zinc-100 font-bold heading">
-          HEJSANsss"
-        </h1>
       </div>
       <InputSection />
     </div>
