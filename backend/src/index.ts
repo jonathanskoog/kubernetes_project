@@ -22,7 +22,18 @@ const storage = multer.diskStorage({
 const upload = multer({
   storage: storage,
   fileFilter: (req, file, cb) => {
-    console.log(file.mimetype);
+    function fileIsNotCorrect() {
+      const allowedExtenstions = [".mp3"];
+      const allowedType = ["audio/mpeg"];
+      return !(
+        allowedExtenstions.includes(path.extname(file.originalname)) &&
+        allowedType.includes(file.mimetype)
+      );
+    }
+    if (fileIsNotCorrect()) {
+      cb(new Error("Incorrect file type, only MP3 files are allowed."));
+      return;
+    }
     cb(null, true);
   },
 });
@@ -55,10 +66,6 @@ app.post(
 
 app.get("/audio-files/:id", async (req: Request, res: Response) => {
   const { id } = req.params;
-  if (!id) {
-    res.status(400).send({ message: "No id provided." });
-    return;
-  }
 
   const entry = await prisma.audioEntry.findUnique({
     where: {
@@ -80,33 +87,32 @@ app.get("/audio-files/:id", async (req: Request, res: Response) => {
   });
 });
 
+app.get("/metadata", async (req: Request, res: Response) => {
+  const metadata = await prisma.audioEntry.findMany({
+    select: {
+      id: true,
+      query: true,
+      createdAt: true,
+    },
+  });
+  res.send({ files: metadata });
+});
+
 app.get("/metadata/:id", async (req: Request, res: Response) => {
   const { id } = req.params;
 
-  const metadata = [];
-  if (!id) {
-    metadata.push(
-      ...(await prisma.audioEntry.findMany({
-        select: {
-          id: true,
-          query: true,
-          createdAt: true,
-        },
-      }))
-    );
-  } else {
-    const entry = await prisma.audioEntry.findUnique({
-      where: {
-        id,
-      },
-      select: {
-        id: true,
-        query: true,
-        createdAt: true,
-      },
-    });
-    entry && metadata.push(entry);
-  }
+  const entry = await prisma.audioEntry.findUnique({
+    where: {
+      id,
+    },
+    select: {
+      id: true,
+      query: true,
+      createdAt: true,
+    },
+  });
+
+  const metadata = entry ? [entry] : [];
   res.send({ files: metadata });
 });
 
