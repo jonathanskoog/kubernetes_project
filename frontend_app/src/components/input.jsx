@@ -42,15 +42,18 @@ const InputSection = () => {
 
     const fetchAudioData = async () => {
         try {
-            const response = await axios.post(`${audioUrl}/send_data`, {
+            const response = await axios.post(`${audioUrl}/send-data`, {
                 query: text,
             }, {
                 responseType: 'arraybuffer',
             }); 
-            
+
             const audioBlob = new Blob([response.data], { type: 'audio/mpeg' });
             const audio = URL.createObjectURL(audioBlob);
-        
+            const id = response.headers.get('X-Files-ID');
+
+
+            // setData(JSON.stringify(response.data));
             setAudioData((prevList) => [...prevList, { text: text, url: audio }]);
 
 
@@ -77,6 +80,7 @@ const InputSection = () => {
         setPressed1(true);
         toast.info("Audio service started!");
         fetchAudioData();
+        //call api to generate audio
         setPressed1(false);
 
     }

@@ -44,6 +44,7 @@ services:
     volumes:
       - ../backend:/app
       - /app/node_modules
+      - ../backend/audio-files:/app/audio-files
     depends_on:
       - postgres
     environment:
@@ -66,3 +67,4 @@ services:
 
 volumes:
   db-data:
+  audio-files:

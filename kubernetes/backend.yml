@@ -31,6 +31,24 @@ spec:
               value: production
           ports:
             - containerPort: 3001
+          volumeMounts:
+            - name: audio-files
+              mountPath: /app/audio-files
+      volumes:
+        - name: audio-files
+          persistentVolumeClaim:
+            claimName: audio-files-pvc
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: audio-files-pvc
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 2Gi
 ---
 apiVersion: v1
 kind: Service
