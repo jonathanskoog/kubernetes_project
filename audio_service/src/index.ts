@@ -69,14 +69,14 @@ app.post("/send-data", async (req: Request, res: Response) => {
     const form = new FormData();
     form.append("file", new Blob([new Uint8Array(audio)]));
     form.append("query", query);
-    let newId = "";
+    let newId = `temp_${Date.now()}-${Math.round(Math.random() * 1e9)}`;
     try {
       const { id } = (
         await axios.post(process.env.BACKEND_URL + "/audio-files", form)
       ).data as { success: boolean; id: string };
       newId = id;
     } catch (error) {
-      newId = `temp_${Date.now()}-${Math.round(Math.random() * 1e9)}`;
+      console.error("Could not save file to backend");
     }
 
     res.set({
