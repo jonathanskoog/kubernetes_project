@@ -77,7 +77,9 @@ app.get("/audio-files/:id", async (req: Request, res: Response) => {
     return;
   }
 
-  res.set("Content-Disposition", `attachment; filename="audiofile-${id}.mp3"`);
+  res.set({
+    "Content-Disposition": `attachment; filename="audiofile-${id}.mp3"`,
+  });
   res.sendFile(path.join(storageFilePath, entry.path), (err) => {
     if (err) {
       console.error("Error sending file:", err);

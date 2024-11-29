@@ -12,12 +12,15 @@ import {Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, getKeyV
 // import { AiFillPlayCircle } from "react-icons/ai";
 import PlayButtonIcon from './play_btn'; // Adjust the path to wherever your file is
 
-
+function toAudioURL(data) {
+    const audioBlob = new Blob([data], { type: 'audio/mpeg' });
+    return URL.createObjectURL(audioBlob);
+}
 
 const InputSection = () => {
     const backendUrl = process.env.REACT_APP_BACKEND_URL;
     const audioUrl = process.env.REACT_APP_AUDIO_URL
-    const [Btn1pressed, setPressed1] = useState(false);
+    const [Btn1pressed, setPressed1] = useState(true);
     const [text, setText] = useState("");
     const [audioData, setAudioData] = useState([]);
 
@@ -27,15 +30,14 @@ const InputSection = () => {
     }, []);
 
     useEffect(() => {
-        // Fetch data from the backend
-        // const fetchData = async () => {
-        //     try {
-        //         const response = await axios.get(`${backendUrl}/audio`);
-        //         setAudioData((prevList) => [...prevList, { text: text, url: audio }]);
-        //     } catch (error) {
-        //         console.error('Error fetching data:', error);
-        //     }
-        // };
+        axios.get(`${backendUrl}/metadata`).then((response) => {
+            const { files } = response.data;
+            setAudioData(files.map(({ id, query, createdAt }) => ({ id, text: query, time: new Date(createdAt), url: undefined })));
+        }).catch((error) => {
+            toast.error('Could not fetch text-to-speech files');
+        }).finally(() => {
+            setPressed1(false);
+        })
     }, []);
 
 
@@ -47,14 +49,8 @@ const InputSection = () => {
             }, {
                 responseType: 'arraybuffer',
             }); 
-
-            const audioBlob = new Blob([response.data], { type: 'audio/mpeg' });
-            const audio = URL.createObjectURL(audioBlob);
             const id = response.headers.get('X-Files-ID');
-
-
-            // setData(JSON.stringify(response.data));
-            setAudioData((prevList) => [...prevList, { text: text, url: audio }]);
+            setAudioData((prevList) => [...prevList, { text: text, url: toAudioURL(response.data), id, time: new Date() }].sort((a, b) => b.time - a.time));
 
 
         } catch (error) {
@@ -62,7 +58,31 @@ const InputSection = () => {
         }
     };
 
-    const playAudio = (url) => {
+    const playAudio = async (id, url) => {
+        if (!url) {
+            try {
+                const dataBuffer = (await axios.get(`${backendUrl}/audio-files/${id}`, {
+                    responseType: 'blob',
+                })).data;
+                const idEntry = audioData.find(({id: i}) => i === id);
+                if (!idEntry) {
+                    throw new Error('No entry with that name');
+                }
+                url = URL.createObjectURL(dataBuffer);
+                setAudioData((audioData) => {
+                    const removedOldId = audioData.filter(({ id: i }) => i !== id);
+                    return [...removedOldId, {
+                        ...idEntry,
+                        url,
+                    }].sort((a, b) => b.time - a.time)
+                })
+                
+
+            } catch(error) {
+                toast.error("Cannot load the text-to-speech file.");
+                return;
+            }
+        }
         const audioElement = document.getElementById('audio-player');
         if (audioElement) {
             audioElement.src = url;
@@ -131,10 +151,10 @@ const InputSection = () => {
 
                             <TableBody>
                                 {audioData.map((item, index) => (
-                                    <TableRow key={index}>
+                                    <TableRow key={item.id}>
                                         <TableCell>{item.text}</TableCell>
                                         <TableCell>
-                                            <Button isIconOnly onClick={() => playAudio(item.url)}>
+                                            <Button isIconOnly onClick={() => playAudio(item.id, item.url)}>
                                                 <PlayButtonIcon />
                                             </Button>
                                         </TableCell>
