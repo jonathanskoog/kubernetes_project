@@ -11,7 +11,7 @@ function App() {
   }, []);
 
   return (
-    <div className="bg-gray-600 w-screen h-screen">
+    <div className="bg-gray-600 w-screen min-h-screen max-h-max h-auto pb-24">
       <Navigationbar />
       <div className="flex flex-col w-fit m-auto mt-24 gap-4 ">
         <h1 className="text-7xl text-center text-zinc-100 font-bold heading">
