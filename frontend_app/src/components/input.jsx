@@ -1,13 +1,13 @@
 import React from 'react';
 import { Input } from "@nextui-org/react";
 import { Button } from "@nextui-org/button";
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { Toaster, toast } from 'sonner'
 import { gsap } from "gsap";
 import { useGSAP } from "@gsap/react";
 import { useEffect } from 'react';
 import axios from 'axios';
-import {Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, getKeyValue} from "@nextui-org/react";
+import {Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, getKeyValue, Pagination} from "@nextui-org/react";
 // import PlayCircleIcon from '@mui/icons-material/PlayCircle';
 // import { AiFillPlayCircle } from "react-icons/ai";
 import PlayButtonIcon from './play_btn'; // Adjust the path to wherever your file is
@@ -24,6 +24,18 @@ const InputSection = () => {
     const [text, setText] = useState("");
     const [audioData, setAudioData] = useState([]);
 
+    const [page, setPage] = useState(1);
+    const rowsPerPage = 3;
+    const pages = Math.ceil(audioData.length / rowsPerPage);
+
+    const items = useMemo(() => {
+        const start = (page - 1) * rowsPerPage;
+        const end = start + rowsPerPage;
+    
+        return audioData.slice(start, end);
+    }, [page, audioData]);
+
+
 
     useGSAP(() => {
         gsap.from(".input", { delay: 1.2, y: 50, opacity: 0 });
@@ -34,7 +46,7 @@ const InputSection = () => {
             const { files } = response.data;
             setAudioData(files.map(({ id, query, createdAt }) => ({ id, text: query, time: new Date(createdAt), url: undefined })));
         }).catch((error) => {
-            toast.error('Could not fetch text-to-speech files');
+            toast.error('Could not fetch any previous text-to-speech files');
         }).finally(() => {
             setPressed1(false);
         })
@@ -143,16 +155,28 @@ const InputSection = () => {
                 (
 
                     <div className='flex flex-row justify-center items-center gap-12 '>
-                        <Table className='w-64' aria-label="Audio table">
+                        <Table className='w-fit' aria-label="Audio table" bottomContent={
+                            <div className="flex w-full justify-center">
+                                <Pagination
+                                    isCompact
+                                    showControls
+                                    showShadow
+                                    color="primary"
+                                    page={page}
+                                    total={pages}
+                                    onChange={(page) => setPage(page)}
+                                />
+                            </div>
+                        }>
 
                             <TableHeader columns={columns}>
                             {(column) => <TableColumn key={column.key}>{column.label}</TableColumn>}
                             </TableHeader>
 
-                            <TableBody>
-                                {audioData.map((item, index) => (
+                            <TableBody items={items}>
+                                {items.map((item, index) => (
                                     <TableRow key={item.id}>
-                                        <TableCell>{item.text}</TableCell>
+                                        <TableCell className='max-w-60 break-words'>{item.text}</TableCell>
                                         <TableCell>
                                             <Button isIconOnly onClick={() => playAudio(item.id, item.url)}>
                                                 <PlayButtonIcon />
