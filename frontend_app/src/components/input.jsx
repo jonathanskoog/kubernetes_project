@@ -7,10 +7,8 @@ import { gsap } from "gsap";
 import { useGSAP } from "@gsap/react";
 import { useEffect } from 'react';
 import axios from 'axios';
-import {Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, getKeyValue, Pagination} from "@nextui-org/react";
-// import PlayCircleIcon from '@mui/icons-material/PlayCircle';
-// import { AiFillPlayCircle } from "react-icons/ai";
-import PlayButtonIcon from './play_btn'; // Adjust the path to wherever your file is
+import {Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Pagination} from "@nextui-org/react";
+import PlayButtonIcon from './play_btn';
 
 function toAudioURL(data) {
     const audioBlob = new Blob([data], { type: 'audio/mpeg' });
@@ -112,7 +110,6 @@ const InputSection = () => {
         setPressed1(true);
         toast.info("Audio service started!");
         fetchAudioData();
-        //call api to generate audio
         setPressed1(false);
 
     }
